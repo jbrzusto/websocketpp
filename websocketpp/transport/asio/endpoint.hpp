@@ -403,6 +403,11 @@ public:
         lib::asio::error_code bec;
 
         m_acceptor->open(ep.protocol(),bec);
+        {
+          int reuse = 1;
+          if (::setsockopt(m_acceptor->native_handle(), SOL_SOCKET, SO_REUSEPORT, (const char*)&reuse, sizeof(reuse)) < 0)
+            std::cerr << "setsockopt(SO_REUSEPORT) failed!!!, handle=" << m_acceptor->native_handle() << "\n";
+        }
         if (!bec) {
             m_acceptor->set_option(lib::asio::socket_base::reuse_address(m_reuse_addr),bec);
         }
